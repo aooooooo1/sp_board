@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.dw.dao.MemberDAO">
+	
+	<select id="selectMemberById" parameterType="str" resultType="member">
+	<!-- MemberDAO.selectMemberById -->
+		SELECT *
+		  FROM member
+		 WHERE id = #{id}
+	</select>
+	
+	<select id="selectAllMemberList" resultType="member">
+		SELECT *
+		  FROM member
+		 ORDER BY regdate desc
+	</select>
+	
+	<!-- <select id="selectSearchMemberList" parameterType="Map" resultType="member">
+	  SELECT * FROM member
+	    <if test="'i'.toString().equals(searchType)">
+	        WHERE id LIKE '%' || #{keyword} || '%'
+	    </if>
+	    <if test="'e'.toString().equals(searchType)">
+	        WHERE email LIKE '%' || #{keyword} || '%'
+	    </if>
+	    <if test="'p'.toString().equals(searchType)">
+	        WHERE phone LIKE '%' || #{keyword} || '%'
+	    </if>
+	</select> -->
+	
+	<sql id="search">
+	  	<if test="searchType == 'i'.toString()">
+	        AND id LIKE '%' || #{keyword} || '%'
+	    </if>
+	    <if test="searchType == 'e'.toString()">
+	        AND email LIKE '%' || #{keyword} || '%'
+	    </if>
+	    <if test="searchType == 'p'.toString()">
+	        AND phone LIKE '%' || #{keyword} || '%'
+	    </if>
+	</sql>
+	
+	<select id="selectSearchMemberList" resultType="member">
+	  SELECT * FROM member
+	  WHERE 1 = 1
+	   <include refid="search"/>
+	</select>
+	
+	<select id="selectSearchMemberListCount" resultType="int">
+		SELECT COUNT(*)
+		 FROM member
+		 WHERE 1 = 1
+		 <include refid="search"/>
+	</select>
+	
+	<insert id="insertMember" parameterType="member">
+		INSERT INTO member(id, pwd, email, phone, picture, name, authority, enabled, regdate)
+		VALUES(#{id}, #{pwd}, #{email}, #{phone}, #{picture}, #{name}, #{authority}, 1, SYSDATE)
+	</insert>
+	
+	<update id="updateMember" parameterType="member">
+		UPDATE member
+		SET
+			pwd 		= #{pwd}
+		   ,email 		= #{email}
+		   ,phone 		= #{phone}
+		   ,name 		= #{name}
+		   ,picture 	= #{picture}
+		   ,authority 	= #{authority}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="selectMemberDelete" parameterType="str">
+		 DELETE FROM MEMBER
+           WHERE ID = #{ID}
+	</delete>
+	
+	<update id="selectMemberStop" parameterType="str">
+		UPDATE member
+		SET   enabled = 0
+		WHERE id = #{id}
+	</update>
+	
+	<update id="selectMemberRerole" parameterType="str">
+		UPDATE member
+		SET   enabled = 1
+		WHERE id = #{id}
+	</update>
+
+</mapper>
